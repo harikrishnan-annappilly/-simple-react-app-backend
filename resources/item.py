@@ -18,6 +18,10 @@ class Item(Resource):
 
     @jwt_required(fresh=True)
     def post(self, name):
+        if ItemModel.find_by_name(name):
+            return {
+                'message': f'item {name} already exists'
+            }, 400
         item = ItemModel(name=name, price=self.parser.parse_args()['price'])
         item.save()
         return item.json()
@@ -54,6 +58,6 @@ class Items(Resource):
             'logged in': (current_identity if current_identity else -1),
             'message' : 'jwt optinal using here',
             'items': [
-                i.json() for i in ItemModel.query.all()
+                i.json() for i in ItemModel.find_all()
             ]
         }
