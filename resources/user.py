@@ -19,7 +19,7 @@ class User(Resource):
         password = payload['password']
         role = payload['role'] if payload['role'] else 'default from function'
         if UserModel.find_by_username(username=username):
-            return {'message': 'username already taken'}
+            return {'message': 'username already taken'}, 400
         user = UserModel(username=username, password=password, role=role)
         user.save()
         return user.json()
@@ -44,6 +44,7 @@ class UserLogin(Resource):
             additional_claims = {
                 'role': user.role,
                 'username': user.username,
+                'isAdmin': user.role.lower() == 'admin',
             }
             access_token = create_access_token(
                 identity=user.id, fresh=True, additional_claims=additional_claims)
@@ -52,6 +53,9 @@ class UserLogin(Resource):
                 'access_token': access_token,
                 'refresh_token': refresh_token
             }
+        return {
+            'message': 'username or password is incorrect'
+        }, 400
 
 
 class Users(Resource):

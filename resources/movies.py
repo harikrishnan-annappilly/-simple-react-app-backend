@@ -47,13 +47,13 @@ class Movie(Resource):
             'message': 'movie not found'
         }, 404
 
-    # @jwt_required()
+    @jwt_required()
     def delete(self, id):
-        # claims = get_jwt()
-        # if claims['role'] != 'admin':
-        #     return {
-        #         'message': 'No permission to use this'
-        #     }, 401
+        claims = get_jwt()
+        if claims['role'] != 'admin':
+            return {
+                'message': 'No permission to use this'
+            }, 401
         movie = MovieModel.find_by_id(id)
         if movie:
             movie.delete()
